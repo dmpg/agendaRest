@@ -57,10 +57,13 @@ public class Contacto extends AbstractEntity implements Serializable {
 
    @Override
    public String toString() {
-      return "Contacto [id=" + this.getId() + ", contactName=" + contactName
-            + ", email=" + email + ", tel=" + tel +
-            "" + ", agenda=" + agenda.toString() +
-                  "]";
+      return "Contacto [id=" + this.getId()
+            + ", contactName=" + contactName
+            + ", email=" + email
+            + ", tel=" + tel
+            + ""
+            + ", agenda=" + agenda
+            + "]";
    }
 
 }

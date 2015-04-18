@@ -125,6 +125,42 @@ public class AgendaController {
       throw new ResourceNotFoundException(msg.toString());
    }
 
+   @RequestMapping(value = "/agendas/{agenda}/contactos", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+   public ResponseEntity<Resource<Contacto>> addContacto(@PathVariable("agenda") Long agendaId, @RequestBody Contacto contacto) {
+      log.info("POST Contacto: {}", contacto);
+
+      // Forzamos que la agenda siga siendo la que corresponde
+      Agenda agenda = agendaRepo.findOne(agendaId);
+      contacto.setAgenda(agenda);
+
+      contacto = contactoRepo.saveAndFlush(contacto);
+      log.info("Contacto creado: {}", contacto.toString());
+
+      return new ResponseEntity<>(ensamblador.ensamblar(contacto), HttpStatus.OK);
+   }
+
+   @RequestMapping(value = "/agendas/{agenda}/contactos/{contacto}", method = RequestMethod.PUT, consumes = { MediaType.APPLICATION_JSON_VALUE }, produces = { MediaType.APPLICATION_JSON_VALUE })
+   public ResponseEntity<Resource<Contacto>> updateContacto(@PathVariable("agenda") Long ownerId, @PathVariable("contacto") Long contactId, @RequestBody Contacto contacto) {
+      String contactName = contacto.getContactName();
+      String email = contacto.getEmail();
+      String tel = contacto.getTel();
+
+      contacto = contactoRepo.findOne(contactId);
+
+      // Forzamos que la agenda siga siendo la que corresponde
+      Agenda agenda = agendaRepo.findOne(ownerId);
+      contacto.setAgenda(agenda);
+
+      contacto.setContactName(contactName);
+      contacto.setEmail(email);
+      contacto.setTel(tel);
+
+      log.info("Contacto PUT:  Agenda id: {} - Contacto: {}", ownerId, contacto);
+      contacto = contactoRepo.saveAndFlush(contacto);
+
+      return new ResponseEntity<>(ensamblador.ensamblar(contacto), HttpStatus.OK);
+   }
+
    @ExceptionHandler(ResourceNotFoundException.class)
    public ResponseEntity<Resource<? extends AbstractEntity>> handleResourceNotFoundException(ResourceNotFoundException e) {
       log.info("Handling Not Found Exception: {}", e.getMessage());

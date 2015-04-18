@@ -11,6 +11,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 public abstract class AbstractEntity {
    @Id
    @GeneratedValue
+   @JsonIgnore
    // @JsonIgnore is to be ignored by introspection-based serialization and
    // deserialization functionality. That is, it should not be consider a
    // "getter", "setter" or "creator".
@@ -28,7 +29,7 @@ public abstract class AbstractEntity {
 
       return version;
    }
- 
+
    public Long getId() {
       return id;
    }

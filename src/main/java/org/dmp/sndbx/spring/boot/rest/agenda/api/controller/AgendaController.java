@@ -110,7 +110,8 @@ public class AgendaController {
    }
 
    @RequestMapping(value = "/agendas/{agenda}/contactos/{contacto}", method = RequestMethod.GET)
-   public ResponseEntity<Resource<Contacto>> getContacto(@PathVariable("agenda") Long agendaId, @PathVariable("contacto") Long contactoId) {
+   public ResponseEntity<Resource<Contacto>> getContacto(@PathVariable("agenda") Long agendaId, @PathVariable("contacto") Long contactoId) 
+   throws ResourceNotFoundException {
       for (Contacto contacto : contactoRepo.findByAgendaId(agendaId)) {
          if (contacto.getId().equals(contactoId)) {
             HttpHeaders responseHeaders = new HttpHeaders();
@@ -120,7 +121,7 @@ public class AgendaController {
          }
       }
 
-      StringBuilder msg = new StringBuilder("NOT FOUND: GET /agendas/").append(agendaId).append("/contactos/").append(contactoId).append(" - El contacto no existente en agenda.");
+      String msg = String.format("NOT FOUND: GET /agendas/'%d'/contactos/'%d' - El contacto no existente en agenda.", agendaId, contactoId);
       log.info(msg.toString());
       throw new ResourceNotFoundException(msg.toString());
    }

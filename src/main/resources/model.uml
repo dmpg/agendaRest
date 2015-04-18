@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<uml:Model xmi:version="20110701" xmlns:xmi="http://www.omg.org/spec/XMI/20110701" xmlns:uml="http://www.eclipse.org/uml2/4.0.0/UML" xmi:id="_fwZLcOPMEeSiQZTtGqZXMA" name="model">
+  <ownedComment xmi:type="uml:Comment" xmi:id="_8yqAwOPMEeSiQZTtGqZXMA">
+    <body>version</body>
+  </ownedComment>
+  <packagedElement xmi:type="uml:Class" xmi:id="_bYoEgOPNEeSiQZTtGqZXMA" clientDependency="_yfn1QOPNEeSiQZTtGqZXMA" name="AgendaController"/>
+  <packagedElement xmi:type="uml:Class" xmi:id="_p3gI4OPNEeSiQZTtGqZXMA" clientDependency="_Ou0O4OPOEeSiQZTtGqZXMA _P3o4IOPOEeSiQZTtGqZXMA" name="Ensamblador"/>
+  <packagedElement xmi:type="uml:Usage" xmi:id="_yfn1QOPNEeSiQZTtGqZXMA" name="1" client="_bYoEgOPNEeSiQZTtGqZXMA" supplier="_p3gI4OPNEeSiQZTtGqZXMA"/>
+  <packagedElement xmi:type="uml:Interface" xmi:id="_8Z5GAOPNEeSiQZTtGqZXMA" name="ResourceAssembler"/>
+  <packagedElement xmi:type="uml:Class" xmi:id="_C7BQsOPOEeSiQZTtGqZXMA" clientDependency="_KLOu8OPOEeSiQZTtGqZXMA" name="AgendaResourceAssembler"/>
+  <packagedElement xmi:type="uml:Class" xmi:id="_E048YOPOEeSiQZTtGqZXMA" clientDependency="_K-qXAOPOEeSiQZTtGqZXMA" name="ContactoResourceAssembler"/>
+  <packagedElement xmi:type="uml:Realization" xmi:id="_KLOu8OPOEeSiQZTtGqZXMA" name="Realization1" client="_C7BQsOPOEeSiQZTtGqZXMA" supplier="_8Z5GAOPNEeSiQZTtGqZXMA"/>
+  <packagedElement xmi:type="uml:Realization" xmi:id="_K-qXAOPOEeSiQZTtGqZXMA" name="Realization2" client="_E048YOPOEeSiQZTtGqZXMA" supplier="_8Z5GAOPNEeSiQZTtGqZXMA"/>
+  <packagedElement xmi:type="uml:Usage" xmi:id="_Ou0O4OPOEeSiQZTtGqZXMA" name="Usage1" client="_p3gI4OPNEeSiQZTtGqZXMA" supplier="_C7BQsOPOEeSiQZTtGqZXMA"/>
+  <packagedElement xmi:type="uml:Usage" xmi:id="_P3o4IOPOEeSiQZTtGqZXMA" name="Usage2" client="_p3gI4OPNEeSiQZTtGqZXMA" supplier="_E048YOPOEeSiQZTtGqZXMA"/>
+</uml:Model>

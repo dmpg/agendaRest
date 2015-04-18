@@ -76,12 +76,9 @@ public class AgendaController {
    public ResponseEntity<Resource<Agenda>> updateAgenda(@PathVariable("agenda") Long ownerId, @RequestBody Agenda agenda) {
 
       String ownerName = agenda.getOwnerName();
-      log.info("1.- Agenda PUT id: {} - Owner Name: {} - Body: {}", ownerId, ownerName, agenda);
       agenda = agendaRepo.findOne(ownerId);
-      log.info("2.- Agenda PUT id: {} - Owner Name: {} - Retrieved: {}", ownerId, ownerName, agenda);
+      log.info("Agenda PUT id: {} - Owner Name: {} - Retrieved: {}", ownerId, ownerName, agenda);
       agenda.setOwnerName(ownerName);
-      log.info("3.- Agenda PUT id: {} - Nueva Agenda: {}", ownerId, agenda);
-
 
       agenda = agendaRepo.saveAndFlush(agenda);
 

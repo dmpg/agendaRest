@@ -24,55 +24,65 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @RestController
+@RequestMapping(value = "/agendas")
 public class AgendaController {
    protected final Logger log = LoggerFactory.getLogger(getClass());
 
-   @Autowired
    private AgendaRepository agendaRepo;
-   @Autowired
    private ContactoRepository contactoRepo;
-   @Autowired
    private Ensamblador ensamblador;
 
-   @RequestMapping(value = "/agendas", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+   @Autowired
+   AgendaController(AgendaRepository agendaRepo, ContactoRepository contactoRepo, Ensamblador ensamblador) {
+      super();
+      this.agendaRepo = agendaRepo;
+      this.contactoRepo = contactoRepo;
+      this.ensamblador = ensamblador;
+   }
+
+   @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
    public ResponseEntity<Collection<Resource<Agenda>>> getAgendas() {
       Collection<Agenda> agendas = agendaRepo.findAll();
-      log.info("Agendas: {}", agendas);
-      log.info("Contactos: {}", contactoRepo.findAll());
+      log.info("Agendas: {} \nContactos: {}", agendas, contactoRepo.findAll());
 
       Collection<Resource<Agenda>> agendaList = new ArrayList<Resource<Agenda>>();
       for (Agenda agenda : agendas) {
          agendaList.add(new Resource<>(agenda, ensamblador.ensamblar(agenda).getLinks()));
       }
 
-      log.info("Saliendo de /agendas - getAgendas()...");
       return new ResponseEntity<Collection<Resource<Agenda>>>(agendaList, HttpStatus.OK);
    }
 
-   @RequestMapping(value = "/agendas/{agenda}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+   @RequestMapping(value = "/{agenda}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
    public ResponseEntity<Resource<Agenda>> getAgenda(@PathVariable("agenda") Long id) {
       Agenda agenda = agendaRepo.findOne(id);
       log.info("ID Agenda en Respuesta: {}", agenda);
 
       HttpHeaders responseHeaders = new HttpHeaders();
-      // responseHeaders.setLocation(location);
-      responseHeaders.set("ETag", agenda.getVersion().toString());
+      responseHeaders.set(HttpHeaders.ETAG, agenda.getVersion().toString());
 
-      return new ResponseEntity<>(ensamblador.ensamblar(agenda), responseHeaders, HttpStatus.OK);
+      Resource<Agenda> response = ensamblador.ensamblar(agenda);
+      log.info("ID Agenda HEADERS: {}", HttpHeaders.readOnlyHttpHeaders(responseHeaders));
+
+      return new ResponseEntity<>(response, responseHeaders, HttpStatus.OK);
    }
 
-   @RequestMapping(value = "/agendas", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+   @RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
    public ResponseEntity<Resource<Agenda>> addAgenda(@RequestBody Agenda agenda) {
       log.info("Agenda: {}", agenda.toString());
-      Agenda agendaNueva = agendaRepo.saveAndFlush(agenda);
-      log.info("Agenda creada: {}", agendaNueva.toString());
+      agenda = agendaRepo.saveAndFlush(agenda);
+      log.info("Agenda creada: {}", agenda);
 
-      return new ResponseEntity<>(ensamblador.ensamblar(agendaNueva), HttpStatus.OK);
+      HttpHeaders httpHeaders = new HttpHeaders();
+      httpHeaders.setLocation(ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(agenda.getId()).toUri());
+
+      return new ResponseEntity<>(ensamblador.ensamblar(agenda), httpHeaders, HttpStatus.OK);
    }
 
-   @RequestMapping(value = "/agendas/{agenda}", method = RequestMethod.PUT, consumes = { MediaType.APPLICATION_JSON_VALUE }, produces = { MediaType.APPLICATION_JSON_VALUE })
+   @RequestMapping(value = "/{agenda}", method = RequestMethod.PUT, consumes = { MediaType.APPLICATION_JSON_VALUE }, produces = { MediaType.APPLICATION_JSON_VALUE })
    public ResponseEntity<Resource<Agenda>> updateAgenda(@PathVariable("agenda") Long ownerId, @RequestBody Agenda agenda) {
 
       String ownerName = agenda.getOwnerName();
@@ -82,10 +92,13 @@ public class AgendaController {
 
       agenda = agendaRepo.saveAndFlush(agenda);
 
-      return new ResponseEntity<>(ensamblador.ensamblar(agenda), HttpStatus.OK);
+      HttpHeaders httpHeaders = new HttpHeaders();
+      httpHeaders.setLocation(ServletUriComponentsBuilder.fromCurrentRequest().buildAndExpand(agenda.getId()).toUri());
+
+      return new ResponseEntity<>(ensamblador.ensamblar(agenda), httpHeaders, HttpStatus.OK);
    }
 
-   @RequestMapping(value = "/agendas/{agenda}", method = RequestMethod.DELETE)
+   @RequestMapping(value = "/{agenda}", method = RequestMethod.DELETE)
    public ResponseEntity<Agenda> deleteAgenda(@PathVariable("agenda") Long id) {
 
       log.info("Agenda DELETE: {}", id);
@@ -96,7 +109,7 @@ public class AgendaController {
       return new ResponseEntity<Agenda>(HttpStatus.NO_CONTENT);
    }
 
-   @RequestMapping(value = "/agendas/{agendaId}/contactos", method = RequestMethod.GET)
+   @RequestMapping(value = "/{agendaId}/contactos", method = RequestMethod.GET)
    public ResponseEntity<Collection<Resource<Contacto>>> getContactos(@PathVariable("agendaId") Long agendaId) {
       Collection<Contacto> contactos = contactoRepo.findByAgendaId(agendaId);
       log.info("GET /agendas/{}/contactos: {}", agendaId, contactos);
@@ -109,15 +122,16 @@ public class AgendaController {
       return new ResponseEntity<Collection<Resource<Contacto>>>(contactoList, HttpStatus.OK);
    }
 
-   @RequestMapping(value = "/agendas/{agenda}/contactos/{contacto}", method = RequestMethod.GET)
-   public ResponseEntity<Resource<Contacto>> getContacto(@PathVariable("agenda") Long agendaId, @PathVariable("contacto") Long contactoId) 
-   throws ResourceNotFoundException {
+   @RequestMapping(value = "/{agenda}/contactos/{contacto}", method = RequestMethod.GET)
+   public ResponseEntity<Resource<Contacto>> getContacto(@PathVariable("agenda") Long agendaId, @PathVariable("contacto") Long contactoId) throws ResourceNotFoundException {
       for (Contacto contacto : contactoRepo.findByAgendaId(agendaId)) {
          if (contacto.getId().equals(contactoId)) {
             HttpHeaders responseHeaders = new HttpHeaders();
-            // responseHeaders.setLocation(location);
-            responseHeaders.set("ETag", contacto.getVersion().toString());
-            return new ResponseEntity<>(ensamblador.ensamblar(contacto), responseHeaders, HttpStatus.OK);
+            responseHeaders.add(HttpHeaders.ETAG, contacto.getVersion().toString());
+            log.info("getContacto Contacto ETag: {}", responseHeaders.getETag());
+
+            Resource<Contacto> recurso = ensamblador.ensamblar(contacto);
+            return new ResponseEntity<>(recurso, responseHeaders, HttpStatus.OK);
          }
       }
 
@@ -126,7 +140,7 @@ public class AgendaController {
       throw new ResourceNotFoundException(msg.toString());
    }
 
-   @RequestMapping(value = "/agendas/{agenda}/contactos", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+   @RequestMapping(value = "/{agenda}/contactos", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
    public ResponseEntity<Resource<Contacto>> addContacto(@PathVariable("agenda") Long agendaId, @RequestBody Contacto contacto) {
       log.info("POST Contacto: {}", contacto);
 
@@ -137,10 +151,13 @@ public class AgendaController {
       contacto = contactoRepo.saveAndFlush(contacto);
       log.info("Contacto creado: {}", contacto.toString());
 
-      return new ResponseEntity<>(ensamblador.ensamblar(contacto), HttpStatus.OK);
+      HttpHeaders httpHeaders = new HttpHeaders();
+      httpHeaders.setLocation(ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(contacto.getId()).toUri());
+
+      return new ResponseEntity<>(ensamblador.ensamblar(contacto), httpHeaders, HttpStatus.OK);
    }
 
-   @RequestMapping(value = "/agendas/{agenda}/contactos/{contacto}", method = RequestMethod.PUT, consumes = { MediaType.APPLICATION_JSON_VALUE }, produces = { MediaType.APPLICATION_JSON_VALUE })
+   @RequestMapping(value = "/{agenda}/contactos/{contacto}", method = RequestMethod.PUT, consumes = { MediaType.APPLICATION_JSON_VALUE }, produces = { MediaType.APPLICATION_JSON_VALUE })
    public ResponseEntity<Resource<Contacto>> updateContacto(@PathVariable("agenda") Long ownerId, @PathVariable("contacto") Long contactId, @RequestBody Contacto contacto) {
       String contactName = contacto.getContactName();
       String email = contacto.getEmail();
@@ -159,7 +176,10 @@ public class AgendaController {
       log.info("Contacto PUT:  Agenda id: {} - Contacto: {}", ownerId, contacto);
       contacto = contactoRepo.saveAndFlush(contacto);
 
-      return new ResponseEntity<>(ensamblador.ensamblar(contacto), HttpStatus.OK);
+      HttpHeaders httpHeaders = new HttpHeaders();
+      httpHeaders.setLocation(ServletUriComponentsBuilder.fromCurrentRequest().buildAndExpand(contacto.getId()).toUri());
+
+      return new ResponseEntity<>(ensamblador.ensamblar(contacto), httpHeaders, HttpStatus.OK);
    }
 
    @ExceptionHandler(ResourceNotFoundException.class)

@@ -3,12 +3,15 @@ package org.dmp.sndbx.spring.boot.rest.agenda.api.controller;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import javax.validation.Valid;
+
 import org.dmp.sndbx.spring.boot.rest.agenda.model.assembler.Ensamblador;
 import org.dmp.sndbx.spring.boot.rest.agenda.model.domain.AbstractEntity;
 import org.dmp.sndbx.spring.boot.rest.agenda.model.domain.Agenda;
 import org.dmp.sndbx.spring.boot.rest.agenda.model.domain.Contacto;
 import org.dmp.sndbx.spring.boot.rest.agenda.model.repo.AgendaRepository;
 import org.dmp.sndbx.spring.boot.rest.agenda.model.repo.ContactoRepository;
+import org.dmp.sndbx.spring.boot.rest.agenda.model.validator.ContactoValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +21,9 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,13 +39,20 @@ public class AgendaController {
    private AgendaRepository agendaRepo;
    private ContactoRepository contactoRepo;
    private Ensamblador ensamblador;
+   private ContactoValidator contactoValidator;
 
    @Autowired
-   AgendaController(AgendaRepository agendaRepo, ContactoRepository contactoRepo, Ensamblador ensamblador) {
+   AgendaController(AgendaRepository agendaRepo, ContactoRepository contactoRepo, Ensamblador ensamblador, ContactoValidator contactoValidator) {
       super();
       this.agendaRepo = agendaRepo;
       this.contactoRepo = contactoRepo;
       this.ensamblador = ensamblador;
+      this.contactoValidator = contactoValidator;
+   }
+
+   @InitBinder
+   protected void initBinder(WebDataBinder binder) {
+      binder.addValidators(contactoValidator);
    }
 
    @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -141,7 +153,7 @@ public class AgendaController {
    }
 
    @RequestMapping(value = "/{agenda}/contactos", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-   public ResponseEntity<Resource<Contacto>> addContacto(@PathVariable("agenda") Long agendaId, @RequestBody Contacto contacto) {
+   public ResponseEntity<Resource<Contacto>> addContacto(@PathVariable("agenda") Long agendaId, @RequestBody @Valid Contacto contacto) {
       log.info("POST Contacto: {}", contacto);
 
       // Forzamos que la agenda siga siendo la que corresponde
@@ -158,7 +170,7 @@ public class AgendaController {
    }
 
    @RequestMapping(value = "/{agenda}/contactos/{contacto}", method = RequestMethod.PUT, consumes = { MediaType.APPLICATION_JSON_VALUE }, produces = { MediaType.APPLICATION_JSON_VALUE })
-   public ResponseEntity<Resource<Contacto>> updateContacto(@PathVariable("agenda") Long ownerId, @PathVariable("contacto") Long contactId, @RequestBody Contacto contacto) {
+   public ResponseEntity<Resource<Contacto>> updateContacto(@PathVariable("agenda") Long ownerId, @PathVariable("contacto") Long contactId, @RequestBody @Valid Contacto contacto) {
       String contactName = contacto.getContactName();
       String email = contacto.getEmail();
       String tel = contacto.getTel();

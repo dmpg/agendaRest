@@ -1,10 +1,10 @@
-package org.dmp.sndbx.spring.boot.rest.agenda.domain.model;
+package org.dmp.sndbx.spring.boot.rest.agenda.model.domain;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.dmp.sndbx.spring.boot.rest.agenda.domain.model.repo.ContactoRepository;
-import org.dmp.sndbx.spring.boot.rest.agenda.domain.model.service.ContactoService;
+import org.dmp.sndbx.spring.boot.rest.agenda.model.repo.ContactoRepository;
+import org.dmp.sndbx.spring.boot.rest.agenda.model.service.ContactoService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

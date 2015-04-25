@@ -1,7 +1,7 @@
 package org.dmp.sndbx.spring.boot.rest.agenda;
 
-import org.dmp.sndbx.spring.boot.rest.agenda.domain.model.repo.AgendaRepository;
-import org.dmp.sndbx.spring.boot.rest.agenda.domain.model.repo.ContactoRepository;
+import org.dmp.sndbx.spring.boot.rest.agenda.model.repo.AgendaRepository;
+import org.dmp.sndbx.spring.boot.rest.agenda.model.repo.ContactoRepository;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;

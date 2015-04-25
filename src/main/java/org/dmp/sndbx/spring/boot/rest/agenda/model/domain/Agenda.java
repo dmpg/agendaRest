@@ -1,4 +1,4 @@
-package org.dmp.sndbx.spring.boot.rest.agenda.domain.model;
+package org.dmp.sndbx.spring.boot.rest.agenda.model.domain;
 
 import java.io.Serializable;
 

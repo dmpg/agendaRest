@@ -1,9 +1,9 @@
-package org.dmp.sndbx.spring.boot.rest.agenda.domain.model;
+package org.dmp.sndbx.spring.boot.rest.agenda.model.domain;
 
 import java.util.Collection;
 
-import org.dmp.sndbx.spring.boot.rest.agenda.domain.model.repo.AgendaRepository;
-import org.dmp.sndbx.spring.boot.rest.agenda.domain.model.service.AgendaService;
+import org.dmp.sndbx.spring.boot.rest.agenda.model.repo.AgendaRepository;
+import org.dmp.sndbx.spring.boot.rest.agenda.model.service.AgendaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

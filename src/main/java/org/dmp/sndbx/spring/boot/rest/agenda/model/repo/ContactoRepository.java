@@ -1,9 +1,9 @@
-package org.dmp.sndbx.spring.boot.rest.agenda.domain.model.repo;
+package org.dmp.sndbx.spring.boot.rest.agenda.model.repo;
 
 import java.util.Collection;
 import java.util.List;
 
-import org.dmp.sndbx.spring.boot.rest.agenda.domain.model.Contacto;
+import org.dmp.sndbx.spring.boot.rest.agenda.model.domain.Contacto;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

@@ -1,8 +1,8 @@
-package org.dmp.sndbx.spring.boot.rest.agenda.domain.model.service;
+package org.dmp.sndbx.spring.boot.rest.agenda.model.service;
 
 import java.util.Collection;
 
-import org.dmp.sndbx.spring.boot.rest.agenda.domain.model.Contacto;
+import org.dmp.sndbx.spring.boot.rest.agenda.model.domain.Contacto;
 
 public interface ContactoService {
 	Contacto findOne(Long contactoId);

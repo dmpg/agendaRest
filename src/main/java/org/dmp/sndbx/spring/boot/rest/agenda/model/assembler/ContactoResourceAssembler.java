@@ -1,4 +1,4 @@
-package org.dmp.sndbx.spring.boot.rest.agenda.domain.model.assembler;
+package org.dmp.sndbx.spring.boot.rest.agenda.model.assembler;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import org.dmp.sndbx.spring.boot.rest.agenda.api.controller.AgendaController;
-import org.dmp.sndbx.spring.boot.rest.agenda.domain.model.Contacto;
+import org.dmp.sndbx.spring.boot.rest.agenda.model.domain.Contacto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;

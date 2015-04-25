@@ -1,6 +1,6 @@
-package org.dmp.sndbx.spring.boot.rest.agenda.domain.model.repo;
+package org.dmp.sndbx.spring.boot.rest.agenda.model.repo;
 
-import org.dmp.sndbx.spring.boot.rest.agenda.domain.model.Agenda;
+import org.dmp.sndbx.spring.boot.rest.agenda.model.domain.Agenda;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 

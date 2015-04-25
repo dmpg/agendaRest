@@ -3,12 +3,12 @@ package org.dmp.sndbx.spring.boot.rest.agenda.api.controller;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.dmp.sndbx.spring.boot.rest.agenda.domain.model.AbstractEntity;
-import org.dmp.sndbx.spring.boot.rest.agenda.domain.model.Agenda;
-import org.dmp.sndbx.spring.boot.rest.agenda.domain.model.Contacto;
-import org.dmp.sndbx.spring.boot.rest.agenda.domain.model.assembler.Ensamblador;
-import org.dmp.sndbx.spring.boot.rest.agenda.domain.model.repo.AgendaRepository;
-import org.dmp.sndbx.spring.boot.rest.agenda.domain.model.repo.ContactoRepository;
+import org.dmp.sndbx.spring.boot.rest.agenda.model.assembler.Ensamblador;
+import org.dmp.sndbx.spring.boot.rest.agenda.model.domain.AbstractEntity;
+import org.dmp.sndbx.spring.boot.rest.agenda.model.domain.Agenda;
+import org.dmp.sndbx.spring.boot.rest.agenda.model.domain.Contacto;
+import org.dmp.sndbx.spring.boot.rest.agenda.model.repo.AgendaRepository;
+import org.dmp.sndbx.spring.boot.rest.agenda.model.repo.ContactoRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

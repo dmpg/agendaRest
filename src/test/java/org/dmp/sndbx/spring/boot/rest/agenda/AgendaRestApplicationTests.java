@@ -1,7 +1,7 @@
 package org.dmp.sndbx.spring.boot.rest.agenda;
 
 import org.dmp.sndbx.spring.boot.rest.agenda.model.repo.AgendaRepository;
-import org.dmp.sndbx.spring.boot.rest.agenda.model.repo.ContactoRepository;
+import org.dmp.sndbx.spring.boot.rest.agenda.model.repo.ContactRepository;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -17,15 +17,15 @@ public class AgendaRestApplicationTests {
 	@Autowired
 	private AgendaRepository agendaRepo;
 	@Autowired
-	private ContactoRepository contactoRepo;
+	private ContactRepository contactRepo;
 
 	@Test
 	public void contextLoads() {
 		long agendaCnt = agendaRepo.count();
-		long contactoCnt = contactoRepo.count();
+		long contactCnt = contactRepo.count();
 
 		Assert.assertTrue(agendaCnt > 0L);
-		Assert.assertTrue(contactoCnt > 0L);
+		Assert.assertTrue(contactCnt > 0L);
 	}
 
 }

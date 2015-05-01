@@ -8,7 +8,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 @Entity
-public class Contacto extends AbstractEntity implements Serializable {
+public class Contact extends AbstractEntity implements Serializable {
    private static final long serialVersionUID = 1L;
 
    private String contactName;
@@ -19,8 +19,8 @@ public class Contacto extends AbstractEntity implements Serializable {
    @JoinColumn(name="ownerId")
    private Agenda agenda;
 
-   public Contacto() {
-      // Constructor Vacio
+   public Contact() {
+      // Empty constructor for JPA
    }
 
    public String getContactName() {
@@ -57,7 +57,7 @@ public class Contacto extends AbstractEntity implements Serializable {
 
    @Override
    public String toString() {
-      return "Contacto [id=" + this.getId()
+      return "Contact [id=" + this.getId()
             + ", contactName=" + contactName
             + ", email=" + email
             + ", tel=" + tel

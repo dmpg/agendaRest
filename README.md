@@ -9,13 +9,17 @@ mvn clean install
 mvn spring-boot:run
 
 # Try rest-shell
+http://localhost:8080:> follow api
 http://localhost:8080/api:> get agendas
 > GET http://localhost:8080/api/agendas
 
 http://localhost:8080/api:> get agendas/1
 > GET http://localhost:8080/api/agendas/1
 
-http://localhost:8080/api:> get agendas/1/contactos
-> GET http://localhost:8080/api/agendas/1/contactos
+http://localhost:8080/api:> get agendas/1/contacts
+> GET http://localhost:8080/api/agendas/1/contacts
+
+http://localhost:8080/api:> get agendas/1/contacts/1
+> GET http://localhost:8080/api/agendas/1/contacts/1
 
 # Contribute!

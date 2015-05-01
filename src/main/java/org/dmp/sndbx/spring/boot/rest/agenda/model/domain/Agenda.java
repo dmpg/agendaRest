@@ -12,8 +12,8 @@ public class Agenda extends AbstractEntity implements Serializable {
 
    // @OneToMany
    // @JoinColumn(name = "ownerId")
-   // // join column is in table for Customer
-   // private List<Contacto> contactos;
+   // // join column is in table for Contact
+   // private List<Contact> contacts;
 
    public Agenda(String ownerName) {
       super();
@@ -21,7 +21,7 @@ public class Agenda extends AbstractEntity implements Serializable {
    }
 
    public Agenda() {
-      // Constructor Vacio por JPA
+      // Empty Constructor for JPA
    }
 
    public String getOwnerName() {

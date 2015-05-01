@@ -5,13 +5,13 @@ import java.util.Collection;
 
 import javax.validation.Valid;
 
-import org.dmp.sndbx.spring.boot.rest.agenda.model.assembler.Ensamblador;
+import org.dmp.sndbx.spring.boot.rest.agenda.model.assembler.AgendaAssembler;
 import org.dmp.sndbx.spring.boot.rest.agenda.model.domain.AbstractEntity;
 import org.dmp.sndbx.spring.boot.rest.agenda.model.domain.Agenda;
-import org.dmp.sndbx.spring.boot.rest.agenda.model.domain.Contacto;
+import org.dmp.sndbx.spring.boot.rest.agenda.model.domain.Contact;
 import org.dmp.sndbx.spring.boot.rest.agenda.model.repo.AgendaRepository;
-import org.dmp.sndbx.spring.boot.rest.agenda.model.repo.ContactoRepository;
-import org.dmp.sndbx.spring.boot.rest.agenda.model.validator.ContactoValidator;
+import org.dmp.sndbx.spring.boot.rest.agenda.model.repo.ContactRepository;
+import org.dmp.sndbx.spring.boot.rest.agenda.model.validator.ContactValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,32 +37,32 @@ public class AgendaController {
    protected final Logger log = LoggerFactory.getLogger(getClass());
 
    private AgendaRepository agendaRepo;
-   private ContactoRepository contactoRepo;
-   private Ensamblador ensamblador;
-   private ContactoValidator contactoValidator;
+   private ContactRepository contactRepo;
+   private AgendaAssembler assembler;
+   private ContactValidator contactValidator;
 
    @Autowired
-   AgendaController(AgendaRepository agendaRepo, ContactoRepository contactoRepo, Ensamblador ensamblador, ContactoValidator contactoValidator) {
+   AgendaController(AgendaRepository agendaRepo, ContactRepository contactRepo, AgendaAssembler ensamblador, ContactValidator contactValidator) {
       super();
       this.agendaRepo = agendaRepo;
-      this.contactoRepo = contactoRepo;
-      this.ensamblador = ensamblador;
-      this.contactoValidator = contactoValidator;
+      this.contactRepo = contactRepo;
+      this.assembler = ensamblador;
+      this.contactValidator = contactValidator;
    }
 
    @InitBinder
    protected void initBinder(WebDataBinder binder) {
-      binder.addValidators(contactoValidator);
+      binder.addValidators(contactValidator);
    }
 
    @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
    public ResponseEntity<Collection<Resource<Agenda>>> getAgendas() {
       Collection<Agenda> agendas = agendaRepo.findAll();
-      log.info("Agendas: {} \nContactos: {}", agendas, contactoRepo.findAll());
+      log.info("Agendas: {} \nContacts: {}", agendas, contactRepo.findAll());
 
       Collection<Resource<Agenda>> agendaList = new ArrayList<Resource<Agenda>>();
       for (Agenda agenda : agendas) {
-         agendaList.add(new Resource<>(agenda, ensamblador.ensamblar(agenda).getLinks()));
+         agendaList.add(new Resource<>(agenda, assembler.assemble(agenda).getLinks()));
       }
 
       return new ResponseEntity<Collection<Resource<Agenda>>>(agendaList, HttpStatus.OK);
@@ -71,12 +71,12 @@ public class AgendaController {
    @RequestMapping(value = "/{agenda}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
    public ResponseEntity<Resource<Agenda>> getAgenda(@PathVariable("agenda") Long id) {
       Agenda agenda = agendaRepo.findOne(id);
-      log.info("ID Agenda en Respuesta: {}", agenda);
+      log.info("ID Agenda retrived: {}", agenda);
 
       HttpHeaders responseHeaders = new HttpHeaders();
       responseHeaders.set(HttpHeaders.ETAG, agenda.getVersion().toString());
 
-      Resource<Agenda> response = ensamblador.ensamblar(agenda);
+      Resource<Agenda> response = assembler.assemble(agenda);
       log.info("ID Agenda HEADERS: {}", HttpHeaders.readOnlyHttpHeaders(responseHeaders));
 
       return new ResponseEntity<>(response, responseHeaders, HttpStatus.OK);
@@ -86,12 +86,12 @@ public class AgendaController {
    public ResponseEntity<Resource<Agenda>> addAgenda(@RequestBody Agenda agenda) {
       log.info("Agenda: {}", agenda.toString());
       agenda = agendaRepo.saveAndFlush(agenda);
-      log.info("Agenda creada: {}", agenda);
+      log.info("Agenda created: {}", agenda);
 
       HttpHeaders httpHeaders = new HttpHeaders();
       httpHeaders.setLocation(ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(agenda.getId()).toUri());
 
-      return new ResponseEntity<>(ensamblador.ensamblar(agenda), httpHeaders, HttpStatus.OK);
+      return new ResponseEntity<>(assembler.assemble(agenda), httpHeaders, HttpStatus.OK);
    }
 
    @RequestMapping(value = "/{agenda}", method = RequestMethod.PUT, consumes = { MediaType.APPLICATION_JSON_VALUE }, produces = { MediaType.APPLICATION_JSON_VALUE })
@@ -107,7 +107,7 @@ public class AgendaController {
       HttpHeaders httpHeaders = new HttpHeaders();
       httpHeaders.setLocation(ServletUriComponentsBuilder.fromCurrentRequest().buildAndExpand(agenda.getId()).toUri());
 
-      return new ResponseEntity<>(ensamblador.ensamblar(agenda), httpHeaders, HttpStatus.OK);
+      return new ResponseEntity<>(assembler.assemble(agenda), httpHeaders, HttpStatus.OK);
    }
 
    @RequestMapping(value = "/{agenda}", method = RequestMethod.DELETE)
@@ -117,87 +117,87 @@ public class AgendaController {
 
       agendaRepo.delete(id);
 
-      log.info("Agenda Eliminada: {}", id);
+      log.info("Agenda deleted: {}", id);
       return new ResponseEntity<Agenda>(HttpStatus.NO_CONTENT);
    }
 
-   @RequestMapping(value = "/{agendaId}/contactos", method = RequestMethod.GET)
-   public ResponseEntity<Collection<Resource<Contacto>>> getContactos(@PathVariable("agendaId") Long agendaId) {
-      Collection<Contacto> contactos = contactoRepo.findByAgendaId(agendaId);
-      log.info("GET /agendas/{}/contactos: {}", agendaId, contactos);
+   @RequestMapping(value = "/{agendaId}/contacts", method = RequestMethod.GET)
+   public ResponseEntity<Collection<Resource<Contact>>> getContacts(@PathVariable("agendaId") Long agendaId) {
+      Collection<Contact> contacts = contactRepo.findByAgendaId(agendaId);
+      log.info("GET /agendas/{}/contacts: {}", agendaId, contacts);
 
-      Collection<Resource<Contacto>> contactoList = new ArrayList<Resource<Contacto>>();
-      for (Contacto contacto : contactos) {
-         contactoList.add(new Resource<>(contacto, ensamblador.ensamblar(contacto).getLinks()));
+      Collection<Resource<Contact>> contactList = new ArrayList<Resource<Contact>>();
+      for (Contact contact : contacts) {
+         contactList.add(new Resource<>(contact, assembler.assemble(contact).getLinks()));
       }
 
-      return new ResponseEntity<Collection<Resource<Contacto>>>(contactoList, HttpStatus.OK);
+      return new ResponseEntity<Collection<Resource<Contact>>>(contactList, HttpStatus.OK);
    }
 
-   @RequestMapping(value = "/{agenda}/contactos/{contacto}", method = RequestMethod.GET)
-   public ResponseEntity<Resource<Contacto>> getContacto(@PathVariable("agenda") Long agendaId, @PathVariable("contacto") Long contactoId) throws ResourceNotFoundException {
-      for (Contacto contacto : contactoRepo.findByAgendaId(agendaId)) {
-         if (contacto.getId().equals(contactoId)) {
+   @RequestMapping(value = "/{agenda}/contacts/{contact}", method = RequestMethod.GET)
+   public ResponseEntity<Resource<Contact>> getContact(@PathVariable("agenda") Long agendaId, @PathVariable("contact") Long contactId) throws ResourceNotFoundException {
+      for (Contact contact : contactRepo.findByAgendaId(agendaId)) {
+         if (contact.getId().equals(contactId)) {
             HttpHeaders responseHeaders = new HttpHeaders();
-            responseHeaders.add(HttpHeaders.ETAG, contacto.getVersion().toString());
-            log.info("getContacto Contacto ETag: {}", responseHeaders.getETag());
+            responseHeaders.add(HttpHeaders.ETAG, contact.getVersion().toString());
+            log.info("getContact Contact ETag: {}", responseHeaders.getETag());
 
-            Resource<Contacto> recurso = ensamblador.ensamblar(contacto);
-            return new ResponseEntity<>(recurso, responseHeaders, HttpStatus.OK);
+            Resource<Contact> resource = assembler.assemble(contact);
+            return new ResponseEntity<>(resource, responseHeaders, HttpStatus.OK);
          }
       }
 
-      String msg = String.format("NOT FOUND: GET /agendas/'%d'/contactos/'%d' - El contacto no existente en agenda.", agendaId, contactoId);
+      String msg = String.format("NOT FOUND: GET /agendas/'%d'/contacts/'%d' - The contact does nto exist in agenda.", agendaId, contactId);
       log.info(msg);
       throw new ResourceNotFoundException(msg);
    }
 
-   @RequestMapping(value = "/{agenda}/contactos", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-   public ResponseEntity<Resource<Contacto>> addContacto(@PathVariable("agenda") Long agendaId, @RequestBody @Valid Contacto contacto) {
-      log.info("POST Contacto: {}", contacto);
+   @RequestMapping(value = "/{agenda}/contacts", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+   public ResponseEntity<Resource<Contact>> addContact(@PathVariable("agenda") Long agendaId, @RequestBody @Valid Contact contact) {
+      log.info("POST Contact: {}", contact);
 
       // Forzamos que la agenda siga siendo la que corresponde
       Agenda agenda = agendaRepo.findOne(agendaId);
-      contacto.setAgenda(agenda);
+      contact.setAgenda(agenda);
 
-      contacto = contactoRepo.saveAndFlush(contacto);
-      log.info("Contacto creado: {}", contacto.toString());
+      contact = contactRepo.saveAndFlush(contact);
+      log.info("Contact created: {}", contact.toString());
 
       HttpHeaders httpHeaders = new HttpHeaders();
-      httpHeaders.setLocation(ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(contacto.getId()).toUri());
+      httpHeaders.setLocation(ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(contact.getId()).toUri());
 
-      return new ResponseEntity<>(ensamblador.ensamblar(contacto), httpHeaders, HttpStatus.OK);
+      return new ResponseEntity<>(assembler.assemble(contact), httpHeaders, HttpStatus.OK);
    }
 
-   @RequestMapping(value = "/{agenda}/contactos/{contacto}", method = RequestMethod.PUT, consumes = { MediaType.APPLICATION_JSON_VALUE }, produces = { MediaType.APPLICATION_JSON_VALUE })
-   public ResponseEntity<Resource<Contacto>> updateContacto(@PathVariable("agenda") Long ownerId, @PathVariable("contacto") Long contactId, @RequestBody @Valid Contacto contacto) {
-      String contactName = contacto.getContactName();
-      String email = contacto.getEmail();
-      String tel = contacto.getTel();
+   @RequestMapping(value = "/{agenda}/contacts/{contact}", method = RequestMethod.PUT, consumes = { MediaType.APPLICATION_JSON_VALUE }, produces = { MediaType.APPLICATION_JSON_VALUE })
+   public ResponseEntity<Resource<Contact>> updateContact(@PathVariable("agenda") Long ownerId, @PathVariable("contact") Long contactId, @RequestBody @Valid Contact contact) {
+      String contactName = contact.getContactName();
+      String email = contact.getEmail();
+      String tel = contact.getTel();
 
-      contacto = contactoRepo.findOne(contactId);
+      contact = contactRepo.findOne(contactId);
 
-      if (null == contacto) {
-         String msg = String.format("Contacto (id '%d' - owner '%d') debe existir para actualizar.", contactId, ownerId);
+      if (null == contact) {
+         String msg = String.format("Contact (id '%d' - owner '%d') should exist previously to update.", contactId, ownerId);
          log.info(msg);
          throw new ResourceNotFoundException(msg);
       }
 
       // Forzamos que la agenda siga siendo la que corresponde
       Agenda agenda = agendaRepo.findOne(ownerId);
-      contacto.setAgenda(agenda);
+      contact.setAgenda(agenda);
 
-      contacto.setContactName(contactName);
-      contacto.setEmail(email);
-      contacto.setTel(tel);
+      contact.setContactName(contactName);
+      contact.setEmail(email);
+      contact.setTel(tel);
 
-      log.info("Contacto PUT:  Agenda id: {} - Contacto: {}", ownerId, contacto);
-      contacto = contactoRepo.saveAndFlush(contacto);
+      log.info("Contact PUT:  Agenda id: {} - Contact: {}", ownerId, contact);
+      contact = contactRepo.saveAndFlush(contact);
 
       HttpHeaders httpHeaders = new HttpHeaders();
-      httpHeaders.setLocation(ServletUriComponentsBuilder.fromCurrentRequest().buildAndExpand(contacto.getId()).toUri());
+      httpHeaders.setLocation(ServletUriComponentsBuilder.fromCurrentRequest().buildAndExpand(contact.getId()).toUri());
 
-      return new ResponseEntity<>(ensamblador.ensamblar(contacto), httpHeaders, HttpStatus.OK);
+      return new ResponseEntity<>(assembler.assemble(contact), httpHeaders, HttpStatus.OK);
    }
 
    @ExceptionHandler(ResourceNotFoundException.class)

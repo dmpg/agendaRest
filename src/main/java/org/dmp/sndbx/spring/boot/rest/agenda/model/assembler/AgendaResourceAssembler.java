@@ -34,7 +34,7 @@ public class AgendaResourceAssembler implements ResourceAssembler<Agenda, Resour
       if (null != agenda) {
          Link selfLink = entityLinks.linkFor(Agenda.class).slash(agenda.getId()).withSelfRel();
          links.add(selfLink);
-         links.add(linkTo(methodOn(AgendaController.class).getContactos(agenda.getId())).withRel("contactos"));
+         links.add(linkTo(methodOn(AgendaController.class).getContacts(agenda.getId())).withRel("contactos"));
 
          return new Resource<>(agenda, links);
       } else {

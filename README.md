@@ -10,6 +10,7 @@ mvn spring-boot:run
 
 # Try rest-shell
 http://localhost:8080:> follow api
+
 http://localhost:8080/api:> get agendas
 > GET http://localhost:8080/api/agendas
 

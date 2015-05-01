@@ -148,8 +148,8 @@ public class AgendaController {
       }
 
       String msg = String.format("NOT FOUND: GET /agendas/'%d'/contactos/'%d' - El contacto no existente en agenda.", agendaId, contactoId);
-      log.info(msg.toString());
-      throw new ResourceNotFoundException(msg.toString());
+      log.info(msg);
+      throw new ResourceNotFoundException(msg);
    }
 
    @RequestMapping(value = "/{agenda}/contactos", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -177,6 +177,12 @@ public class AgendaController {
 
       contacto = contactoRepo.findOne(contactId);
 
+      if (null == contacto) {
+         String msg = String.format("Contacto (id '%d' - owner '%d') debe existir para actualizar.", contactId, ownerId);
+         log.info(msg);
+         throw new ResourceNotFoundException(msg);
+      }
+
       // Forzamos que la agenda siga siendo la que corresponde
       Agenda agenda = agendaRepo.findOne(ownerId);
       contacto.setAgenda(agenda);
@@ -196,7 +202,7 @@ public class AgendaController {
 
    @ExceptionHandler(ResourceNotFoundException.class)
    public ResponseEntity<Resource<? extends AbstractEntity>> handleResourceNotFoundException(ResourceNotFoundException e) {
-      log.info("Handling Not Found Exception: {}", e.getMessage());
+      log.info("Not Found Exception: {}", e.getMessage());
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
    }
 }

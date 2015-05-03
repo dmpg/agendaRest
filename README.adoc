@@ -43,6 +43,6 @@ http://localhost:8080/api:> get agendas/1/contacts/1
 = Contribute!
 === TODO List
 * Migrate Maven to Gradle
-* Implement OAut2 with JWT
+* Implement OAut2 with http://jwt.io/[JWT]
 * Implement Caching
 

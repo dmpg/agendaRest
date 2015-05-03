@@ -2,13 +2,28 @@
 This is just a sandbox to play with the Spring Boot...
 The idea is to demo how to implement RESTful services using Full Spring Stack without XML configurations
 
-# Install
-mvn clean install
+= Install
+[source]
+----
+$ mvn clean install
+----
 
-#Run
-mvn spring-boot:run
+= Run
+[source]
+----
+$ mvn spring-boot:run
+----
 
-# Try rest-shell
+To package and run as a standalone JAR, you can do this:
+[source]
+----
+$ mvn package
+$ java -jar target/*.jar
+----
+
+== Try rest-shell
+[source]
+----
 http://localhost:8080:> follow api
 
 http://localhost:8080/api:> get agendas
@@ -22,5 +37,6 @@ http://localhost:8080/api:> get agendas/1/contacts
 
 http://localhost:8080/api:> get agendas/1/contacts/1
 > GET http://localhost:8080/api/agendas/1/contacts/1
+----
 
 # Contribute!
